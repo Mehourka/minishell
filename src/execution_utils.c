@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   execution_utils.c                                  :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kmehour <kmehour@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/15 13:10:41 by kmehour           #+#    #+#             */
-/*   Updated: 2023/10/15 14:57:24 by kmehour          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 # include "execution.h"
 # include "parsing.h"
@@ -33,7 +22,6 @@ char	*ft_strjoin_path(const char *parent, const char *child)
 	len_str1 = ft_strlen(parent);
 	len_str2 = ft_strlen(child);
 	len_sep  = ft_strlen(separator);
-	
 	new_string = malloc(len_str1 + len_sep + len_str2 + 1);
 	if (!new_string)
 		return (NULL);
@@ -46,9 +34,9 @@ char	*ft_strjoin_path(const char *parent, const char *child)
 
 /*
 	@brief Search and check access to a command in PATH
-	
+
 	@param cmd Command name
-	@param envp Enviroment variable 
+	@param envp Enviroment variable
 	@return return the command path if accessible, NULL otherwise
  */
 char	*ft_get_cmd_path(char *cmd, char *const envp[])
@@ -71,7 +59,6 @@ char	*ft_get_cmd_path(char *cmd, char *const envp[])
 		i++;
 	}
 	ft_free_tab(path_tab);
-	free(cmd);
 	if (res == 0)
 		return (tmp);
 	return (NULL);
@@ -102,3 +89,23 @@ char	**ft_get_envpaths(char *const envp[])
 	return (tab);
 }
 
+/*
+	@brief Create a pipe and set in/out for each command
+ */
+void ft_set_pipes(t_exec **exec_tab, int cmd_count)
+{
+	int i;
+
+	i = 0;
+	while (cmd_count > 1 && i < cmd_count - 1)
+	{
+		// TODO
+		if (pipe(exec_tab[i]->pfd) == -1)
+		{
+			ft_raise_err("Pipe error", 4);
+		}
+		exec_tab[i]->output = exec_tab[i]->pfd[1];
+		exec_tab[i + 1]->input = exec_tab[i]->pfd[0];
+		i++;
+	}
+}

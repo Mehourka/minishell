@@ -1,19 +1,6 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: aouellet <aouellet@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/28 10:50:43 by kmehour           #+#    #+#             */
-/*   Updated: 2023/10/18 18:38:40 by aouellet         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
-
-void test_parsing(char *line);
+char*replace_vars_by_value(char *line, char *const envp[]);
 
 char **copy_envp(char *const envp[])
 {
@@ -45,7 +32,7 @@ int	main(int argc, char **argv, char *const envp[])
 	char	**envp_cp;
 	(void)	argc;
 	(void)	argv;
-	t_exec	*command;
+	t_exec	**exec_tab = NULL;
 
 	ft_set_signal_actions(SIG_MAIN);
 	while (1)
@@ -62,15 +49,21 @@ int	main(int argc, char **argv, char *const envp[])
 			printf("exit\n");
 			exit(0);
 		}
+
 		//	Append to history
 		if (*line)
 		{
+			// Add modified line to history
 			add_history(line);
-			//	Parse Input
-			command = ft_parse_input(line, envp_cp);
-			
+
+			// Parse dollard signe
+			line = replace_vars_by_value(line,envp);
+
+			//	Parse Modified input
+			exec_tab = ft_parse_pipes(line, envp);
+
 			//	Execute Command(s)
-			ft_execute(command, envp_cp);
+			ft_execute_tab(exec_tab, envp);
 		}
 		free(line);
 	}

@@ -1,14 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: kmehour <kmehour@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/07/28 10:50:39 by kmehour           #+#    #+#             */
-/*   Updated: 2023/10/16 19:25:49 by kmehour          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -39,5 +28,8 @@ void	ft_change_wspace(char *str);
 // =============== Parsing ===============
 char	**ft_parse_cmd(char *cmd_str);
 
+
+// =============== Errors ===============
+void	ft_raise_err(char *err_str, int err_nb);
 
 #endif
