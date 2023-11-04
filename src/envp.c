@@ -16,6 +16,8 @@ void env(char *const envp[])
 }
 
 
+//env utils
+
 int get_var_index(char *var, char *const envp[])
 {
 	int i;
@@ -31,11 +33,8 @@ int get_var_index(char *var, char *const envp[])
 	//look user variables
 	return -1;
 }
-#include <linux/limits.h>
 
 
-//cd
-//	change oldpwd and pwd
 
 size_t get_env_size(char**env)
 {
@@ -60,6 +59,19 @@ char** get_new_env(size_t size)
 
 	return new_env;
 }
+/*
+void populate_new_env(char**src_env, char**dest_env)
+{
+	int i;
+
+	i = 0;
+	while(src_env[i]) //review this function entirely
+	{
+		//if(src_env[i])
+		dest_env[i] = src_env[i];
+		i++;
+	}
+}*/
 
 char** copy_system_env(char**env)
 {
@@ -82,40 +94,62 @@ char** copy_system_env(char**env)
 	return new_env;
 }
 
-void populate_new_env(char**src_env, char**dest_env)
-{
-	int i;
+//--------builtints utils
 
-	i = 0;
-	while(src_env[i])
-	{
-		if(src_env[i])
-			dest_env[i] = src_env[i];
-		i++;
-	}
-}
-
-char**remove_var(char**env, int var_index)
+char** remove_var(char*var_to_remove,char**env)
 {
 	char **new_env;
-	
+	int i;
+	int j;
+
+	i = 0;
+	j = 0;
 	new_env = get_new_env(get_env_size(env) - 1);
 	if(!new_env)
 		return NULL;
 
-	free(env[var_index]);
-	env[var_index] = NULL;
+	while(new_env[i])
+	{
+		if(env[j] == var_to_remove)
+			j++;	
+		new_env[i] = env[j];
+		i++;
+		j++;
+	}
 
-	populate_new_env(env,new_env);
+	free(var_to_remove);
 
 	free(env); //free pointers array
 	return new_env;
 
 }
 
-// add
+char** add_var(char*var, char**env) //in export test if var qualifies or not
+{
+	char **new_env;
+	int i;
 
-// start with export and unset
+	i = 0;
+	new_env = get_new_env(get_env_size(env) + 1);
+	if(!new_env)
+		return NULL;
+	
+	
+	while(env[i])
+	{
+		new_env[i] = env[i];
+		i++;
+	}
+
+	new_env[i] = ft_strdup(var);
+	if(!new_env)
+		return NULL;
+	
+	free(env);
+	return new_env;
+}
+
+
 
 int modify_var(char**env, int index, char*value)//deal with = and index on export 
 {
@@ -128,13 +162,35 @@ int modify_var(char**env, int index, char*value)//deal with = and index on expor
 
 //----------builtins-------
 
+//cd
+//	change oldpwd and pwd
 
-int ft_unset(char*var)
-{
-	
-}
+typedef struct s_env{
+	char**env;
+}	t_env;
 
 
+
+
+
+int ft_unset(t_env *s_env, char**cmd)
+{	
+	char*var_string;
+	int i;
+
+	var_string = NULL;
+	i = 1; 
+	while(cmd[i])
+	{
+		var_string = get_var_string(cmd[i],s_env->env);
+		if(var_string)
+			s_env->env = remove_var(var_string,s_env->env);
+		i++;
+	}
+}	
+
+
+#include <linux/limits.h>
 int ft_pwd(void)
 {
 	char wd[PATH_MAX];
@@ -148,5 +204,9 @@ int ft_pwd(void)
 	return 1; //error function here
 }
 
-
+//export
+//	export no arg almost like env
+//	if var exists, modify it
+//	if not, check if valid
+//	if valid, modify it
 
