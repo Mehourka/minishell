@@ -160,6 +160,21 @@ int modify_var(char**env, int index, char*value)//deal with = and index on expor
 
 }
 
+int verify_arg_input(char*var) //check if theres = in another function after that one
+{
+	int i;
+
+	i = 0;
+	if(ft_isdigit(var[i]));
+		return -1;
+	while(var[i] && var[i] != '=')
+	{
+		if(!ft_isalnum(var[i]) && var[i] != '_')
+			return -1;
+		i++;
+	}
+	return 0;
+}
 //----------builtins-------
 
 //cd
@@ -189,6 +204,28 @@ int ft_unset(t_env *s_env, char**cmd)
 	}
 }	
 
+int ft_export(t_env*s_env, char**cmd)
+{
+	int i;
+
+	i = 0;
+	while(cmd[i])
+	{
+		if(!verify_arg_input(cmd[i]))
+		{
+			//messageerror no return
+			printf("s");
+		}
+		else if(get_char_index(cmd[i],'='))
+		{
+			//get variable   
+			//check if exists
+
+			s_env->env = add_var(cmd[i],s_env->env);
+		}
+		i++;
+	}
+}
 
 #include <linux/limits.h>
 int ft_pwd(void)
