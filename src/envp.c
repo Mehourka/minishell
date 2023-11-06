@@ -151,12 +151,12 @@ char** add_var(char*var, char**env) //in export test if var qualifies or not
 
 
 
-int modify_var(char**env, int index, char*value)//deal with = and index on export 
+int replace_var(char**env, int index, char*value)
 {
 	free(env[index]);
 	env[index] = ft_strdup(value);
 	if(!env[index])
-		return -1;   //delete this function
+		return -1; 
 
 }
 
@@ -207,25 +207,32 @@ int ft_unset(t_env *s_env, char**cmd)
 int ft_export(t_env*s_env, char**cmd)
 {
 	int i;
+	int index;
+	char var;
 
+	var = NULL;
 	i = 0;
+	index = 0;
+	//deal with no arg, env
 	while(cmd[i])
 	{
 		if(!verify_arg_input(cmd[i]))
-		{
-			//messageerror no return
-			printf("s");
-		}
+			printf("s");//messageerror no return, keep while
 		else if(get_char_index(cmd[i],'='))
 		{
-			//get variable   
-			//check if exists
-
-			s_env->env = add_var(cmd[i],s_env->env);
+			var = ft_substr(cmd[i],0,get_char_index(cmd[i],'='));
+			if(!var)
+				return -1; //replace with error function
+			index = get_var_index(var,s_env->env);
+			if(index)
+				replace_var(env,index,cmd[i]);
+			else
+				s_env->env = add_var(cmd[i],s_env->env);
+			free(var);
 		}
 		i++;
 	}
-}
+} //verify if dollar sign function works with empty variable
 
 #include <linux/limits.h>
 int ft_pwd(void)
