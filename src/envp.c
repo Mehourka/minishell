@@ -6,14 +6,6 @@ int get_char_index(char*s, char c);
 
 
 //builtins:
-void env(char *const envp[])
-{
-    while(*envp)
-    {
-        printf("%s\n",*envp);
-        envp++;
-    }
-}
 
 
 //env utils
@@ -73,7 +65,7 @@ void populate_new_env(char**src_env, char**dest_env)
 	}
 }*/
 
-char** copy_system_env(char**env)
+char** copy_env(char**env)
 {
 	char **new_env;
 	int i;
@@ -83,10 +75,10 @@ char** copy_system_env(char**env)
 	if(!new_env)
 		return NULL;
 
-	while(new_env[i])
+	while(env[i])
 	{
 		new_env[i] = ft_strdup(env[i]);
-		if(new_env[i])
+		if(!new_env[i])
 			return NULL;
 		i++;
 	}
@@ -160,7 +152,7 @@ int replace_var(char**env, int index, char*value)
 
 }
 
-int verify_arg_input(char*var) //check if theres = in another function after that one
+int verify_arg_input(char*var) 
 {
 	int i;
 
@@ -175,6 +167,61 @@ int verify_arg_input(char*var) //check if theres = in another function after tha
 	}
 	return 0;
 }
+
+void ascii_sort(char**env, size_t len)
+{
+	int i;
+	int j;
+	char *temp;
+
+	i = 0;
+    j = 0;
+	temp = NULL;
+	while(j < len - 1)
+	{
+		while(i < len - 1)
+		{
+			if(strcmp(env[i],env[i + 1]) > 0)
+			{
+				temp = env[i];
+				env[i] = env[i + 1];
+				env[i + 1] = temp;
+			}
+			i++;
+		}
+		i = 0;
+		j++;
+	}
+}
+
+void print_sorted_env(char**env)
+{
+	int i;
+	int j;
+	char **env_cp;
+
+	int i = 0;
+    int j = 0;
+	env_cp = copy_env(env);
+	ascii_sort(env_cp,get_env_size(env_cp));	
+	while(env_cp[i])
+	{
+		if(env_cp[i][0] != '_' && env_cp[i][1] != '=')
+		{
+			ft_putstr_fd("declare -x ",1);
+            while(env_cp[i][j] != '=')
+            {
+                write(1,&env_cp[i][j],1);
+                j++;
+            }
+            printf("=\"%s\"\n",env_cp[i] + get_char_index(env_cp[i],'=') + 1);
+		}
+        j = 0;
+		i++;	
+	}
+}
+
+
 //----------builtins-------
 
 //cd
@@ -211,9 +258,13 @@ int ft_export(t_env*s_env, char**cmd)
 	char var;
 
 	var = NULL;
-	i = 0;
+	i = 1;
 	index = 0;
-	//deal with no arg, env
+	
+	//deal with no arg, env. //use printf with "" . sort alpha
+	// when = no arg put ""
+	if(!cmd[i])
+		print_sorted_env(s_env->env);
 	while(cmd[i])
 	{
 		if(!verify_arg_input(cmd[i]))
@@ -225,7 +276,7 @@ int ft_export(t_env*s_env, char**cmd)
 				return -1; //replace with error function
 			index = get_var_index(var,s_env->env);
 			if(index)
-				replace_var(env,index,cmd[i]);
+				replace_var(s_env->env,index,cmd[i]);
 			else
 				s_env->env = add_var(cmd[i],s_env->env);
 			free(var);
@@ -248,9 +299,20 @@ int ft_pwd(void)
 	return 1; //error function here
 }
 
+int ft_env(char **env)
+{
+    while(*env)
+    {
+        printf("%s\n",*env);
+        env++;
+    }
+}
+
+int ft_echo(char**env)
 //export
 //	export no arg almost like env
 //	if var exists, modify it
 //	if not, check if valid
 //	if valid, modify it
 
+//update pwd. old pwd and _ variable all the time env
