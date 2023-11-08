@@ -299,20 +299,55 @@ int ft_pwd(void)
 	return 1; //error function here
 }
 
-int ft_env(char **env)
+int ft_env(t_env*s_env)
 {
-    while(*env)
+    while(*(s_env->env))
     {
-        printf("%s\n",*env);
-        env++;
+        printf("%s\n",*(s_env->env));
+        s_env->env++;
     }
 }
 
-int ft_echo(char**env)
-//export
-//	export no arg almost like env
-//	if var exists, modify it
-//	if not, check if valid
-//	if valid, modify it
+int n_flag_check(char*cmd)
+{
+	int i;
+	int j;
 
+	i = 1;
+	j = 0;
+	if(cmd[0] != '-' || cmd[1] != 'n')  
+		return -1;
+	
+	while(cmd[i])
+	{
+		if(cmd[i] != 'n')
+			return -1;
+		i++;
+	}
+	
+	return 1;
+}
+int ft_echo(char**cmd)
+{
+	int i;
+	int n;
+
+	i = 1;
+	n = 0;
+	while(cmd[i] && n_flag_check(cmd[i]) == 1)
+	{
+		n = 1;
+		i++;
+	}
+	while(cmd[i])
+	{
+		printf("%s",cmd[i]);
+		if(cmd[i + 1])
+			printf(" ");
+		i++;
+	}
+	if(n == 0)
+		printf("\n");
+
+}
 //update pwd. old pwd and _ variable all the time env
