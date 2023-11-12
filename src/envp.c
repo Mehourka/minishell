@@ -350,4 +350,51 @@ int ft_echo(char**cmd)
 		printf("\n");
 
 }
-//update pwd. old pwd and _ variable all the time env
+void update_cwd(char**env,char*path,char*old_path)
+{
+	char *var;
+	int index;
+
+	var = ft_strjoin("PWD=",path); 
+	index = get_var_index("PWD",env);
+	if(index == -1)
+		add_var(var,env);
+	else
+		replace_var(env,index,var);
+
+	var = ft_strjoin("OLDPWD=",old_path); 
+	index = get_var_index("OLDPWD",env);
+	if(index == -1)
+		add_var(var,env);
+	else
+		replace_var(env,index,var);
+	
+}
+
+int ft_cd(char*cmd,t_env*s_env) 
+{
+	char *path;
+	char pwd[PATH_MAX];
+	char oldpwd[PATH_MAX];
+	
+	path = NULL;
+	if(cmd[2])
+	{
+		printf("too much arg");
+		return;
+	}
+	if(!cmd[1])
+		path = getenv("HOME");
+	else
+		path = cmd[1];
+	if(getcwd(oldpwd,PATH_MAX) != 0)
+		return -1;
+	if(chdir(path) != 0)
+		return -1;
+	if(getcwd(pwd,PATH_MAX) != 0)
+		return -1;
+			
+	update_cwd(s_env->env,pwd,oldpwd);
+	
+	return 0;
+}

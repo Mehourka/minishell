@@ -1,11 +1,13 @@
 #include "minishell.h"
 
 char*replace_vars_by_value(char *line, char *const envp[]);
-char **copy_env(char *const envp[]);
+//char **copy_env(char *const envp[]);
 char **env_add(char *const envp[],char*new_var);
 
 void env(char *const envp[]);
-int ft_pwd(void);
+
+int replace_var(char**env, int index, char*value);
+
 
 int	main(int argc, char **argv, char *const envp[])
 {
@@ -13,7 +15,7 @@ int	main(int argc, char **argv, char *const envp[])
 	char	**envp_cp = NULL;
 	(void)	argc;
 	(void)	argv;
-	t_exec	**exec_tab = NULL;
+	//t_exec	**exec_tab = NULL;
 
 	ft_set_signal_actions(SIG_MAIN);
 	while (1)
@@ -24,7 +26,7 @@ int	main(int argc, char **argv, char *const envp[])
 		//env(envp_cp);
 		//	Readline
 		line = readline("minishell > ");
-		ft_pwd();
+		
 
 		
 		//	Check exit conditions
@@ -42,12 +44,12 @@ int	main(int argc, char **argv, char *const envp[])
 
 			// Parse dollard signe
 			line = replace_vars_by_value(line,envp_cp);
-
+			ft_cd(line,envp_cp);
 			//	Parse Modified input
-			exec_tab = ft_parse_pipes(line, envp_cp);
+			//exec_tab = ft_parse_pipes(line, envp_cp);
 
 			//	Execute Command(s)
-			ft_execute_tab(exec_tab, envp_cp);
+			//ft_execute_tab(exec_tab, envp_cp);
 		}
 		free(line);
 	}
